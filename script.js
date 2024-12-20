@@ -5,6 +5,7 @@ class Game2048 {
         this.gridContainer = document.querySelector('.grid-container');
         this.scoreElement = document.getElementById('score');
         this.init();
+        this.setupTheme();
     }
 
     init() {
@@ -146,6 +147,18 @@ class Game2048 {
             }
         }
         return true;
+    }
+
+    setupTheme() {
+        this.themeToggle = document.getElementById('theme-toggle');
+        this.currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', this.currentTheme);
+        
+        this.themeToggle.addEventListener('click', () => {
+            this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', this.currentTheme);
+            localStorage.setItem('theme', this.currentTheme);
+        });
     }
 }
 
