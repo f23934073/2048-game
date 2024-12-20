@@ -2,6 +2,8 @@
 
 A classic 2048 game implementation using HTML, CSS, and JavaScript.
 
+🎮 [Play the Game](https://f23934073.github.io/2048-game/)
+
 ## How to Play
 
 1. Use arrow keys to move tiles
