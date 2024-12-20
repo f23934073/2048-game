@@ -2,19 +2,47 @@ class Game2048 {
     constructor() {
         this.grid = Array(16).fill(0);
         this.score = 0;
+        this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
         this.gridContainer = document.querySelector('.grid-container');
         this.scoreElement = document.getElementById('score');
+        this.highScoreElement = document.getElementById('high-score');
+        this.timerElement = document.getElementById('timer');
+        this.timer = null;
+        this.seconds = 0;
         this.init();
         this.setupTheme();
+        this.setupHelp();
+        this.updateHighScore();
     }
 
     init() {
         this.grid = Array(16).fill(0);
         this.score = 0;
+        this.seconds = 0;
         this.scoreElement.textContent = '0';
+        this.updateHighScore();
+        this.startTimer();
         this.addNewTile();
         this.addNewTile();
         this.updateDisplay();
+    }
+
+    startTimer() {
+        if (this.timer) {
+            clearInterval(this.timer);
+        }
+        this.seconds = 0;
+        this.updateTimerDisplay();
+        this.timer = setInterval(() => {
+            this.seconds++;
+            this.updateTimerDisplay();
+        }, 1000);
+    }
+
+    updateTimerDisplay() {
+        const minutes = Math.floor(this.seconds / 60);
+        const remainingSeconds = this.seconds % 60;
+        this.timerElement.textContent = `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
     }
 
     addNewTile() {
@@ -57,6 +85,14 @@ class Game2048 {
                 this.gridContainer.appendChild(tile);
             }
         });
+    }
+
+    updateHighScore() {
+        if (this.score > this.highScore) {
+            this.highScore = this.score;
+            localStorage.setItem('highScore', this.highScore);
+        }
+        this.highScoreElement.textContent = this.highScore;
     }
 
     move(direction) {
@@ -128,6 +164,7 @@ class Game2048 {
         if (moved) {
             this.addNewTile();
             this.scoreElement.textContent = this.score;
+            this.updateHighScore();
         }
 
         this.updateDisplay();
@@ -159,6 +196,26 @@ class Game2048 {
             document.documentElement.setAttribute('data-theme', this.currentTheme);
             localStorage.setItem('theme', this.currentTheme);
         });
+    }
+
+    setupHelp() {
+        const modal = document.getElementById('help-modal');
+        const btn = document.getElementById('help-btn');
+        const span = document.getElementsByClassName('close')[0];
+
+        btn.onclick = () => {
+            modal.style.display = 'block';
+        }
+
+        span.onclick = () => {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
     }
 }
 
