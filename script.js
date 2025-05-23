@@ -9,6 +9,9 @@ class Game2048 {
         this.timerElement = document.getElementById('timer');
         this.timer = null;
         this.seconds = 0;
+        this.previousGrid = null;
+        this.previousScore = 0;
+        this.undoButton = document.getElementById('undo-btn');
         this.init();
         this.setupTheme();
         this.setupHelp();
@@ -16,6 +19,11 @@ class Game2048 {
     }
 
     init() {
+        this.previousGrid = null;
+        this.previousScore = 0;
+        if (this.undoButton) { // Check if button exists
+            this.undoButton.disabled = true;
+        }
         this.grid = Array(16).fill(0);
         this.score = 0;
         this.seconds = 0;
@@ -96,7 +104,9 @@ class Game2048 {
     }
 
     move(direction) {
-        const previousGrid = [...this.grid];
+        const currentGridForUndo = [...this.grid];
+        const currentScoreForUndo = this.score;
+        const previousGrid = [...this.grid]; // This line seems redundant now, but let's keep it for now and see if it causes issues. It's from the original code.
         let moved = false;
 
         // Helper function to merge tiles
@@ -162,6 +172,11 @@ class Game2048 {
         }
 
         if (moved) {
+            this.previousGrid = currentGridForUndo; // Store the state *before* this successful move
+            this.previousScore = currentScoreForUndo;
+            if (this.undoButton) {
+                this.undoButton.disabled = false;
+            }
             this.addNewTile();
             this.scoreElement.textContent = this.score;
             this.updateHighScore();
@@ -217,11 +232,35 @@ class Game2048 {
             }
         }
     }
+
+    undoMove() {
+        if (this.previousGrid) {
+            this.grid = [...this.previousGrid];
+            this.score = this.previousScore;
+
+            this.scoreElement.textContent = this.score;
+            this.updateDisplay(); // Make sure this redraws the board based on this.grid
+            this.updateHighScore(); // Recalculate high score just in case, though undoing shouldn't give a new high score.
+
+            this.previousGrid = null; // Only one level of undo
+            this.previousScore = 0;
+            if (this.undoButton) {
+                this.undoButton.disabled = true;
+            }
+        }
+    }
 }
 
 // Game initialization
 document.addEventListener('DOMContentLoaded', () => {
     const game = new Game2048();
+
+    const undoBtn = document.getElementById('undo-btn');
+    if (undoBtn) {
+        undoBtn.addEventListener('click', () => {
+            game.undoMove();
+        });
+    }
 
     // Handle keyboard events
     document.addEventListener('keydown', (e) => {
@@ -251,6 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle New Game button
     document.getElementById('new-game').addEventListener('click', () => {
-        game.init();
+        game.init(); // init() already disables the undo button
     });
 });
