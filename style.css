@@ -74,6 +74,26 @@ h1 {
     background: #7f6a56;
 }
 
+#undo-btn {
+    background: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+#undo-btn:hover {
+    background: #7f6a56; /* Consider a theme-aware hover color if possible */
+}
+
+#undo-btn:disabled {
+    background: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+}
+
 .grid-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
